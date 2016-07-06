@@ -16,11 +16,25 @@ screen_cable_width = [10,2,0]; // z ignored
 screen_cable_offset = [13.5,0,0]; //relative to upper left edge of bend
 screen_cable_recess = [10,80,2];
 
+// back parameters
+back_height = 1;
+drude_size = [73, 49.81,5];
+drude_holes = [[4.5, 4.93], [68.78,4.93],[23.16,45.39],[68.78,45.39]];
+drude_riser_height = 3; // relative to zero
+
 // derived
 $fn =100;
 z_eps = [0,0,0.1];
 bezel_radius = lens_radius+wall_thick/2;
 bezel_size = [lens_size[0], lens_size[1], 0]+[wall_thick, wall_thick, total_height];
+
+back_size = [lens_size[0], lens_size[1], 0]+[wall_thick, wall_thick,back_height];
+
+drude_offset = [0,back_size[1]-drude_size[1]-wall_thick, 1];
+
+// cover
+cover_radius = bezel_radius;
+cover_size = [bezel_size[0],bezel_size[1]-drude_offset[1],12]; // plus radius
 
 module rounded_cube(v,r){
 hull(){
@@ -82,4 +96,72 @@ difference(){
 }
 }
 
-front();
+module back(){
+    difference(){
+        union(){
+            difference(){
+                rounded_cube(back_size, bezel_radius);
+                //translate(drude_offset-[0,wall_thick,0])
+                //    cube(drude_size+[wall_thick*2,wall_thick*2,0]);
+            }
+            translate(drude_offset+[wall_thick,0,0])
+                for(hole = drude_holes){
+                    translate(hole)
+                    cylinder(r=3.5,h=drude_riser_height);
+                }
+        }
+        translate(drude_offset+[wall_thick,0,0])
+        for(hole = drude_holes){
+                    translate(hole)
+                    cylinder(r=1.5,h=4);
+                }
+        //hack
+        translate([38,83,-0.1])
+            cube(screen_cable_width+[2,4,back_size[2]*2]);
+        translate([6.25,105,-0.1])
+            cube([6,12,4]);
+    }
+}
+
+module cover_base(){
+    difference(){
+        union(){
+            rounded_cube(cover_size-[0,0,cover_radius],cover_radius);
+            hull(){
+                translate([0,0,cover_size[2]-cover_radius]){
+                translate([cover_radius,cover_radius,0])
+                    sphere(r=cover_radius,$fn=20);
+                translate([cover_size[0]-cover_radius,cover_radius,0])
+                    sphere(r=cover_radius,$fn=20);
+                translate([cover_radius,cover_size[1]-cover_radius,0])
+                    sphere(r=cover_radius,$fn=20);
+                translate([cover_size[0]-cover_radius,cover_size[1]-cover_radius,0])
+                    sphere(r=cover_radius,$fn=20);
+                }
+                cube(cover_size-[0,cover_radius,cover_size[2]-1]);
+            }
+        }
+    }
+}
+
+module cover(){
+    difference(){
+        union(){
+            cover_base();
+        }
+        c = cover_size +[0,0,bezel_radius];
+        t = c - [wall_thick, wall_thick,wall_thick];
+        translate([wall_thick/2,wall_thick/2,-0.1])
+            scale([t[0]/c[0],t[1]/c[1],t[2]/c[2]])cover_base();
+        translate([14,-0.1,2])
+            cube([9,5,6]);
+        translate([47+wall_thick/2,-0.1,2])
+            cube([16,5,8]);
+    }
+}
+
+// Generate different components
+
+//front();
+//back();
+cover();
