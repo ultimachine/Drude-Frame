@@ -6,15 +6,15 @@ lens_size = [74.14,134.58,1.1+0.25]+[0.140,0.140,0];
 touch_size = [66.04,116.08,0.7]+[2,2,0.3];
 touch_offset = [0,1.05,0]; //positive axis direction
 touch_cable_offset = [4.5,0.75,0]; // negative axis direction (cable in crnr furthest from orig)
-touch_cable_size = [15,2,0]; // z ignored, equal to bezel size
-touch_cable_recess = [15,30,1.0]+[0,0,0.1];
+touch_cable_size = [17,2,0]; // z ignored, equal to bezel size
+touch_cable_recess = [17,30,1.5]+[0,0,0.1];
 screen_size = [64.191, 116.374, 1.213+0.229]+[0.14,0.14,0];
 screen_offset = [0,-3.89,0]; // positive axis direction
-screen_bend_size = [42,12,1];
+screen_bend_size = [42,12,3];
 screen_bend_offset = [9,-1,0]; // relative to corner of screen, z from size
-screen_cable_width = [9,2,0]; // z ignored
-screen_cable_offset = [10,0,0]; //relative to upper left edge of bend
-screen_cable_recess = [9,80,0.5];
+screen_cable_width = [10,2,0]; // z ignored
+screen_cable_offset = [13.5,0,0]; //relative to upper left edge of bend
+screen_cable_recess = [10,80,2];
 
 // derived
 $fn =100;
@@ -36,6 +36,7 @@ hull(){
         }
     }
 
+module front(){
 difference(){
     union(){
         // bezel
@@ -79,3 +80,6 @@ difference(){
                      }
                  }
 }
+}
+
+front();
