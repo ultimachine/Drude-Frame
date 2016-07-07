@@ -1,20 +1,20 @@
 
-wall_thick = 2;
+wall_thick = 1;
 total_height = 5;
 lens_radius = 2;
-lens_size = [74.14,134.58,1.1+0.25]+[0.140,0.140,0];
+lens_size = [74.14,134.58,1.1+0.25]+[0.050,0.050,0];
 touch_size = [66.04,116.08,0.7]+[2,2,0.3];
 touch_offset = [0,1.05,0]; //positive axis direction
 touch_cable_offset = [4.5,0.75,0]; // negative axis direction (cable in crnr furthest from orig)
 touch_cable_size = [17,2,0]; // z ignored, equal to bezel size
-touch_cable_recess = [17,30,1.5]+[0,0,0.1];
+touch_cable_recess = [17,30,15];
 screen_size = [64.191, 116.374, 1.213+0.229]+[0.14,0.14,0];
 screen_offset = [0,-3.89,0]; // positive axis direction
-screen_bend_size = [42,12,3];
+screen_bend_size = [42,12,10];
 screen_bend_offset = [9,-1,0]; // relative to corner of screen, z from size
 screen_cable_width = [10,2,0]; // z ignored
 screen_cable_offset = [13.5,0,0]; //relative to upper left edge of bend
-screen_cable_recess = [10,80,2];
+screen_cable_recess = [10,70,10];
 
 // back parameters
 back_height = 1;
@@ -26,7 +26,7 @@ drude_riser_height = 3; // relative to zero
 $fn =100;
 z_eps = [0,0,0.1];
 bezel_radius = lens_radius+wall_thick/2;
-bezel_size = [lens_size[0], lens_size[1], 0]+[wall_thick, wall_thick, total_height];
+bezel_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2, total_height];
 
 back_size = [lens_size[0], lens_size[1], 0]+[wall_thick, wall_thick,back_height];
 
@@ -83,12 +83,10 @@ difference(){
         //screen
         cube(screen_size+z_eps+[0,0,total_height]);
         // screen bend
-        translate(screen_bend_offset-[0,0,screen_bend_size[2]]){
+        translate(screen_bend_offset-[0,0,screen_bend_size[2]/2]){
              cube(screen_bend_size+z_eps);
-            translate([0,screen_bend_size[1],
-                            -bezel_size[2]+lens_size[2]+touch_size[2]+screen_size[2]+screen_bend_size[2]-0.1]
+            translate([0,screen_bend_size[1],0]
                             +screen_cable_offset){
-                cube(screen_cable_width+[0,0,bezel_size[2]]+z_eps);
                 cube(screen_cable_recess+z_eps);
                             }
                      }
@@ -162,6 +160,6 @@ module cover(){
 
 // Generate different components
 
-//front();
+front();
 //back();
-cover();
+//cover();
