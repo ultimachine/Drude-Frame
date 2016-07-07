@@ -150,7 +150,7 @@ module cover(){
             cover_base();
         }
         c = cover_size +[0,0,bezel_radius];
-        t = c - [wall_thick, wall_thick,wall_thick];
+        t = c - [wall_thick, wall_thick,wall_thick/2];
         translate([wall_thick/2,wall_thick/2,-0.1])
             scale([t[0]/c[0],t[1]/c[1],t[2]/c[2]])cover_base();
         translate([14,-0.1,2])
