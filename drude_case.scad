@@ -8,7 +8,7 @@ touch_offset = [0,1.05,0]; //positive axis direction
 touch_cable_offset = [4.5,0.75,0]; // negative axis direction (cable in crnr furthest from orig)
 touch_cable_size = [17,2,0]; // z ignored, equal to bezel size
 touch_cable_recess = [17,30,15];
-screen_size = [64.191, 116.374, 1.213+0.229]+[0.14,0.14,0];
+screen_size = [64.191, 116.374, 1.213+0.229]+[0.0,0.0,0];
 screen_offset = [0,-3.89,0]; // positive axis direction
 screen_bend_size = [42,12,10];
 screen_bend_offset = [9,-1,0]; // relative to corner of screen, z from size
@@ -28,9 +28,9 @@ z_eps = [0,0,0.1];
 bezel_radius = lens_radius+wall_thick/2;
 bezel_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2, total_height];
 
-back_size = [lens_size[0], lens_size[1], 0]+[wall_thick, wall_thick,back_height];
+back_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2,back_height];
 
-drude_offset = [0,back_size[1]-drude_size[1]-wall_thick, 1];
+drude_offset = [wall_thick,back_size[1]-drude_size[1]-wall_thick-15, 1];
 
 // cover
 cover_radius = bezel_radius;
@@ -114,10 +114,18 @@ module back(){
                     cylinder(r=1.5,h=4);
                 }
         //hack
-        translate([38,83,-0.1])
-            cube(screen_cable_width+[2,4,back_size[2]*2]);
-        translate([6.25,105,-0.1])
-            cube([6,12,4]);
+        translate([38,84,-0.1])
+            cube(screen_cable_width+[1,3.5,back_size[2]*2]);
+        #translate([0,
+                            (bezel_size[1]+lens_size[1])/2,
+                            -0.1]+touch_cable_offset)
+        mirror()
+        rotate([0,0,180]){
+            // hole
+            cube(touch_cable_size+[0,0,bezel_size[2]]+z_eps*2);
+            //recess
+            cube(touch_cable_recess);
+        }
     }
 }
 
@@ -158,8 +166,15 @@ module cover(){
     }
 }
 
+module asm(){
+    front();
+    translate([bezel_size[0],0,0])rotate([0,180,0])back();
+}
+
+asm();
+
 // Generate different components
 
-front();
+//front();
 //back();
 //cover();
