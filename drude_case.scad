@@ -21,6 +21,7 @@ back_height = 1;
 drude_size = [73, 49.81,5];
 drude_holes = [[4.5, 4.93], [68.78,4.93],[23.16,45.39],[68.78,45.39]];
 drude_riser_height = 3; // relative to zero
+drude_riser_radius = 3;
 
 // derived
 $fn =100;
@@ -31,6 +32,15 @@ bezel_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2, total_
 back_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2,back_height];
 
 drude_offset = [wall_thick,back_size[1]-drude_size[1]-wall_thick-15, 1];
+
+mounting_holes = [[drude_riser_radius,drude_riser_height,0],
+                                  [bezel_size[0]-drude_riser_radius,drude_riser_height,0],
+                                  [drude_riser_radius,bezel_size[1]-drude_riser_height,0],
+                                  [bezel_size[0]/2,bezel_size[1]-drude_riser_height,0],
+                                  [bezel_size[0]/2,drude_riser_height,0],
+                                  [bezel_size[0]-drude_riser_radius,bezel_size[1]-drude_riser_height,0],
+                                  [bezel_size[0]-drude_riser_radius,bezel_size[1]/2,0],
+                                  [drude_riser_radius,bezel_size[1]/2,0]];
 
 // cover
 cover_radius = bezel_radius;
@@ -91,6 +101,8 @@ difference(){
                             }
                      }
                  }
+    for(mt=mounting_holes)
+        translate(mt-z_eps)cylinder(r=1.5, h=2.1);
 }
 }
 
@@ -105,26 +117,30 @@ module back(){
             translate(drude_offset+[wall_thick,0,0])
                 for(hole = drude_holes){
                     translate(hole)
-                    cylinder(r=3.5,h=drude_riser_height);
+                    cylinder(r=drude_riser_radius,h=drude_riser_height);
                 }
+            for(mt = mounting_holes){
+                translate(mt)cylinder(r=drude_riser_radius, h=back_size[2]+drude_riser_height);
+            }
         }
         translate(drude_offset+[wall_thick,0,0])
         for(hole = drude_holes){
                     translate(hole)
-                    cylinder(r=1.5,h=4);
+                    cylinder(r=1.5,h=drude_riser_height+0.1);
                 }
         //hack
         translate([38,84,-0.1])
             cube(screen_cable_width+[1,3.5,back_size[2]*2]);
-        #translate([0,
-                            (bezel_size[1]+lens_size[1])/2,
-                            -0.1]+touch_cable_offset)
-        mirror()
+        translate([touch_cable_size[0]+touch_cable_offset[0]+wall_thick,bezel_size[1]-wall_thick-touch_cable_offset[1],-0.1])
         rotate([0,0,180]){
             // hole
             cube(touch_cable_size+[0,0,bezel_size[2]]+z_eps*2);
             //recess
             cube(touch_cable_recess);
+        }
+        // mounting holes
+        for(mt = mounting_holes){
+            translate(mt-z_eps)cylinder(r=1.5, h=back_size[2]+drude_riser_height+0.2);
         }
     }
 }
