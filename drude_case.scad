@@ -129,8 +129,8 @@ module back(){
                     cylinder(r=1.5,h=drude_riser_height+0.1);
                 }
         //hack
-        translate([38,84,-0.1])
-            cube(screen_cable_width+[1,3.5,back_size[2]*2]);
+        translate([37.75,64,-0.1])
+            cube(screen_cable_width+[0,22,back_size[2]*2]);
         translate([touch_cable_size[0]+touch_cable_offset[0]+wall_thick,bezel_size[1]-wall_thick-touch_cable_offset[1],-0.1])
         rotate([0,0,180]){
             // hole
@@ -187,10 +187,10 @@ module asm(){
     translate([bezel_size[0],0,0])rotate([0,180,0])back();
 }
 
-asm();
+//asm();
 
 // Generate different components
 
 //front();
-//back();
+back();
 //cover();
