@@ -34,76 +34,74 @@ back_size = [lens_size[0], lens_size[1], 0]+[wall_thick*2, wall_thick*2,back_hei
 drude_offset = [(bezel_size[0]-drude_size[0])/2,back_size[1]/2+(back_size[1]/2-drude_size[1])/2, 1];
 
 mounting_holes = [[drude_riser_radius,drude_riser_height,0],
-                                  [bezel_size[0]-drude_riser_radius,drude_riser_height,0],
-                                  [drude_riser_radius,bezel_size[1]-drude_riser_height,0],
-                                  [bezel_size[0]/2,bezel_size[1]-drude_riser_height,0],
-                                  [bezel_size[0]/2,drude_riser_height,0],
-                                  [bezel_size[0]-drude_riser_radius,bezel_size[1]-drude_riser_height,0],
-                                  [bezel_size[0]-drude_riser_radius,bezel_size[1]/2,0],
-                                  [drude_riser_radius,bezel_size[1]/2,0]];
+                  [bezel_size[0]-drude_riser_radius,drude_riser_height,0],
+                  [drude_riser_radius,bezel_size[1]-drude_riser_height,0],
+                  [bezel_size[0]/2,bezel_size[1]-drude_riser_height,0],
+                  [bezel_size[0]/2,drude_riser_height,0],
+                  [bezel_size[0]-drude_riser_radius,bezel_size[1]-drude_riser_height,0],
+                  [bezel_size[0]-drude_riser_radius,bezel_size[1]/2,0],
+                  [drude_riser_radius,bezel_size[1]/2,0]];
 
 // cover
 cover_radius = bezel_radius;
 cover_size = [bezel_size[0],drude_size[1]+wall_thick*2,12]; // plus radius
 
 module rounded_cube(v,r){
-hull(){
-            for(i = [0,1]){
-                for(j = [0,1]){
-                    // shrink by radius
-                    k = i == 0 ? 1 : -1; 
-                    l = j == 0 ? 1 : -1;
-                    translate([v[0]*i+r*k, v[1]*j+r*l,0])
-            cylinder(r=r,h=v[2]);
-                }
+    hull(){
+        for(i = [0,1]){
+            for(j = [0,1]){
+                // shrink by radius
+                k = i == 0 ? 1 : -1; 
+                l = j == 0 ? 1 : -1;
+                translate([v[0]*i+r*k, v[1]*j+r*l,0])
+                    cylinder(r=r,h=v[2]);
             }
         }
     }
+}
 
 module front(){
-difference(){
-    union(){
-        // bezel
-        rounded_cube(bezel_size, bezel_radius);
-    }
-    //lens
-    translate((bezel_size-lens_size)/2+[0,0,(bezel_size[2]-lens_size[2])/2])
-        rounded_cube(lens_size+[0,0,0.1], lens_radius);
-    //touch sensor
-    translate([(bezel_size[0]-touch_size[0])/2,
-                      (bezel_size[1]-touch_size[1])/2,
-                       bezel_size[2]-lens_size[2]-touch_size[2]]
-                     +touch_offset)
-        cube(touch_size+z_eps);
-    //touch cable hole
-    translate(bezel_size-[(bezel_size[0]-lens_size[0])/2,
-                                           (bezel_size[1]-lens_size[1])/2,
-                                            bezel_size[2]+0.1]-touch_cable_offset)
-        rotate([0,0,180]){
-            // hole
-            cube(touch_cable_size+[0,0,bezel_size[2]]+z_eps*2);
-            //recess
-            cube(touch_cable_recess);
+    difference(){
+        union(){
+            // bezel
+            rounded_cube(bezel_size, bezel_radius);
         }
-    //screen
-    translate([(bezel_size[0]-screen_size[0])/2,
-                      (bezel_size[1]-screen_size[1])/2,
-                       bezel_size[2]-lens_size[2]-touch_size[2]-screen_size[2]]
-                     +touch_offset+screen_offset){
+        //lens
+        translate((bezel_size-lens_size)/2+[0,0,(bezel_size[2]-lens_size[2])/2])
+            rounded_cube(lens_size+[0,0,0.1], lens_radius);
+        //touch sensor
+        translate([(bezel_size[0]-touch_size[0])/2,
+                          (bezel_size[1]-touch_size[1])/2,
+                           bezel_size[2]-lens_size[2]-touch_size[2]]
+                         +touch_offset)
+            cube(touch_size+z_eps);
+        //touch cable hole
+        translate(bezel_size-[(bezel_size[0]-lens_size[0])/2,
+                                               (bezel_size[1]-lens_size[1])/2,
+                                                bezel_size[2]+0.1]-touch_cable_offset)
+            rotate([0,0,180]){
+                // hole
+                cube(touch_cable_size+[0,0,bezel_size[2]]+z_eps*2);
+                //recess
+                cube(touch_cable_recess);
+            }
         //screen
-        cube(screen_size+z_eps+[0,0,total_height]);
-        // screen bend
-        translate(screen_bend_offset-[0,0,screen_bend_size[2]/2]){
-             cube(screen_bend_size+z_eps);
-            translate([0,screen_bend_size[1],0]
-                            +screen_cable_offset){
-                cube(screen_cable_recess+z_eps);
-                            }
-                     }
-                 }
-    for(mt=mounting_holes)
-        translate(mt-z_eps)cylinder(r=1.5, h=2.1);
-}
+        translate([(bezel_size[0]-screen_size[0])/2,
+                   (bezel_size[1]-screen_size[1])/2,
+                    bezel_size[2]-lens_size[2]-touch_size[2]-screen_size[2]]
+                    +touch_offset+screen_offset){
+            //screen
+            cube(screen_size+z_eps+[0,0,total_height]);
+            // screen bend
+            translate(screen_bend_offset-[0,0,screen_bend_size[2]/2]){
+                cube(screen_bend_size+z_eps);
+                translate([0,screen_bend_size[1],0] + screen_cable_offset)
+                    cube(screen_cable_recess+z_eps);
+             }
+        }
+        for(mt=mounting_holes)
+            translate(mt-z_eps)cylinder(r=1.5, h=2.1);
+    }
 }
 
 module back(){
@@ -127,7 +125,7 @@ module back(){
         for(hole = drude_holes){
                     translate(hole)
                     cylinder(r=1.5,h=drude_riser_height+0.1);
-                }
+        }
         //hack
         translate([37.75,74,-0.1])
             cube(screen_cable_width+[0,12,back_size[2]*2]);
@@ -151,14 +149,14 @@ module cover_base(){
             rounded_cube(cover_size-[0,0,cover_radius],cover_radius);
             hull(){
                 translate([0,0,cover_size[2]-cover_radius]){
-                translate([cover_radius,cover_radius,0])
-                    sphere(r=cover_radius,$fn=20);
-                translate([cover_size[0]-cover_radius,cover_radius,0])
-                    sphere(r=cover_radius,$fn=20);
-                translate([cover_radius,cover_size[1]-cover_radius,0])
-                    sphere(r=cover_radius,$fn=20);
-                translate([cover_size[0]-cover_radius,cover_size[1]-cover_radius,0])
-                    sphere(r=cover_radius,$fn=20);
+                    translate([cover_radius,cover_radius,0])
+                        sphere(r=cover_radius,$fn=20);
+                    translate([cover_size[0]-cover_radius,cover_radius,0])
+                        sphere(r=cover_radius,$fn=20);
+                    translate([cover_radius,cover_size[1]-cover_radius,0])
+                        sphere(r=cover_radius,$fn=20);
+                    translate([cover_size[0]-cover_radius,cover_size[1]-cover_radius,0])
+                        sphere(r=cover_radius,$fn=20);
                 }
                 cube(cover_size-[0,cover_radius,cover_size[2]-1]);
             }
